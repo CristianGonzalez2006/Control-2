@@ -28,7 +28,40 @@ def inicio():
             ]
         }
     )
+    
+@app.get("/libros")
+def obtener_libros():
+    return jsonify(list(libros.values()))
 
+@app.get("/libros/<int:id>")
+def obtener_libro(id):
+    libro = libros.get(id)
+    
+    if libro:
+        return jsonify(libro)
+    else:
+        return jsonify({"error": "Libro no encontrado"}), 404
+        
+app.post("/libros")
+def agregar_libro():
+    datos = request.get_json()
+    
+    if not datos:
+        return jsonify({"error": "Debe eneviar información"}), 400
+    if "titulo" not in datos or "autor" not in datos:
+        return jsonify({"error": "Los campos son requeridos"}), 400
+    
+    nuevo_id = max(libros.keys()) + 1
+
+    libros[nuevo_id] = {
+        "id": nuevo_id,
+        "titulo": datos["titulo"],
+        "autor": datos["autor"],
+        "disponible": datos["Disponible"]
+        
+    }
+
+    return jsonify({libros[nuevo_id]}), 201
 
 if __name__ == '__main__':
     app.run(debug=True)
